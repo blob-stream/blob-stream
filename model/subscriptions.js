@@ -7,7 +7,6 @@ module.exports = (legacy, log) => [
 
   function subscribeToLogChanges (send, done) {
     var d = debug(debugPrefix + ':subscribeToLogChanges')
-    var effect = send
     // subscribe to all hyperlog changes
     // caused through syncing or by ourselves
     var changesStream = log.createReadStream({
@@ -18,7 +17,7 @@ module.exports = (legacy, log) => [
     changesStream.on('end', () => done(new Error('hyperlog createReadStream ended')))
     changesStream.on('data', node => {
       d('received log entry', node.value.toString())
-      effect('fetch_related_torrent', JSON.parse(node.value.toString()),
+      send('fetch_related_torrent', JSON.parse(node.value.toString()),
         err => err && done(err))
     })
   },
@@ -28,7 +27,10 @@ module.exports = (legacy, log) => [
 
     var webrtcSwarm = require('webrtc-swarm')
     var signalhub = require('signalhub')
-    var hub = signalhub('blob-stream', ['https://signalhub.perguth.de:65300'])
+    var hub = signalhub('blob-stream', [
+      'http://localhost:8080',
+      'https://signalhub.perguth.de:65300'
+    ])
     var swarmOpts = legacy || {}
     var swarm = webrtcSwarm(hub, swarmOpts)
 

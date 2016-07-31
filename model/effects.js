@@ -39,7 +39,7 @@ module.exports = {
   'create torrent': (data, state, send, done) => {
     // var d = debug(debugPrefix + ':create-torrent')
     var file = data.file
-    state.swarm.seed(file, {}, torrent => {
+    state.swarm.seed(file, torrent => {
       send('create log entry', Object.assign(data, {
         magnetLink: torrent.magnetURI
       }), err => err && done(err))
@@ -71,7 +71,7 @@ module.exports = {
     var peer = data.peer
 
     peer.on('error', err => done(err))
-    peer.on('close', () => done(new Error('simple-peer closed')))
+    peer.on('close', () => done('simple-peer closed: ' + data.id))
 
     var rs = state.log.createReplicationStream({live: true})
     rs.on('end', () => done(new Error('replication stream ended')))

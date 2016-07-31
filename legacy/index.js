@@ -3,7 +3,7 @@ var fs = require('fs')
 var path = require('path')
 var chokidar = require('chokidar') // file watcher
 var flatfile = require('flat-file-db')
-var log = require('./hyperlog')
+var networking = require('./networking')
 
 var pwd = path.dirname(require.main.filename) + '/'
 var ephemeralFolder = pwd + 'ephemeral/'
@@ -27,15 +27,15 @@ db.on('open', () => {
 
   var newFile = path => {
     if (db.get(path)) return
-    console.log('adding file: ', path)
+    console.log('found new file: ', path)
     db.put(path, true)
-    log.add(path)
+    networking.add(path)
   }
   watcher.on('change', newFile)
   watcher.on('add', newFile)
 
   watcher.on('unlink', path => {
-    if (!db.get(path)) return
-    db.rm(path, true)
+    // if (!db.get(path)) return
+    // db.del(path, true)
   })
 })
